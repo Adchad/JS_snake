@@ -1,1 +1,1 @@
-# JS_tetris
+# paint_clone

@@ -1,0 +1,53 @@
+.insidediv{
+    position: absolute;
+    border:1px solid #859d9c;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    z-index: 5;
+    
+}
+
+
+.insidediv:hover{
+    animation: test 0.05s;
+    transform: translate(-3px, -3px);
+    width: 26px;
+    height: 26px;
+    z-index: 10;
+
+}
+
+
+@keyframes test {
+    from {
+        transform: translate(0px, 0px);
+        width: 20px;
+        height: 20px;
+        }
+    to {
+        transform: translate(-3px, -3px);
+        width: 26px;
+        height: 26px;
+    }
+  }
+
+.btn-color{
+    position: relative;
+    width: 30px;
+    height: 30px;
+}
+
+#btn-1{background-color: chocolate;}
+#btn-2{background-color: aliceblue;}
+#btn-3{background-color: firebrick;}
+#btn-4{background-color: white;}
+#btn-5{background-color: black;}
+
+.btn-erase{
+    position: absolute;
+    left:90%;
+    width: 30px;
+    height: 30px;
+    background: url(./clear.png);
+}
