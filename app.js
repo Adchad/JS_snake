@@ -1,87 +1,184 @@
 
-var mouseIsDown = false
 var great_div_DOM = document.querySelector('.greatdiv');
 
-
 var xpadded,ypadded;
+var sizex,sizey;
 
-let matriceStylee = Array(60).fill().map(() => Array(25).fill(""));
+
+sizex = 30;
+sizey = 30;
+
 
 var offsetx = 100;
 var offsety = 100;
-var currentColor = "black"
 
-for (let x = 0; x < matriceStylee.length; x++) {
-    for (let y = 0; y < matriceStylee[0].length; y++) {
-        xpadded = ("00" + x).slice (-3);
-        ypadded = ("00" + y).slice (-3);
-        great_div_DOM.innerHTML += "<div class=\"insidediv\" id=\"indiv-"+ xpadded +"-"+ ypadded + "\"></div>\n";
-        document.querySelector("#indiv-"+ xpadded +"-"+ ypadded).style.left = x*23 + offsetx + "px";
-        document.querySelector("#indiv-"+ xpadded +"-"+ ypadded).style.top = y*23 + offsety + "px";
-           
-    }
-
+class Point{
+  constructor(x,y){
+    this.x = x;
+    this.y = y;
+  }
 }
 
-great_div_DOM.addEventListener('mousemove',drawOnover);
-great_div_DOM.addEventListener('click',drawOnClick);
-great_div_DOM.addEventListener('drag', function(){mouseIsDown = false});
-great_div_DOM.addEventListener('mousedown', function(){mouseIsDown = true});
-great_div_DOM.addEventListener('mouseup', function(){mouseIsDown = false});
-
-
-
-document.getElementById("btn-1").addEventListener('click', function() {
-    currentColor = "chocolate";
-});
-
-document.getElementById("btn-2").addEventListener('click', function() {
-    currentColor = "aliceblue";
-});
-
-document.getElementById("btn-3").addEventListener('click', function() {
-    currentColor = "firebrick";
-});
-document.getElementById("btn-4").addEventListener('click', function() {
-    currentColor = "white";
-});
-document.getElementById("btn-5").addEventListener('click', function() {
-    currentColor = "black";
-});
-
-document.querySelector(".btn-erase").addEventListener('click',erase);
-
-function drawOnClick(event){
-    var targetId = event.target.id;
-    var xa,ya;
-    if(targetId.slice(0,5) === "indiv"){ 
-              
-        document.getElementById(targetId).style.backgroundColor = currentColor;
-
-        xa = targetId.slice(6,9) - 0;
-        ya = targetId.slice(10,13) - 0;
-        matriceStylee[xa][ya] = currentColor;
-
-    }
-
+class Obstacle{
+  constructor(x,y){
+    this.x = x;
+    this.y = y;
+  }
 }
 
-function drawOnover(event){
-    var targetId = event.target.id;
-    var xa,ya;
-    if(targetId.slice(0,5) === "indiv"){
-        if(mouseIsDown ){ 
-            document.getElementById(targetId).style.backgroundColor = currentColor;
-            xa = targetId.slice(6,9)-0;
-            ya = targetId.slice(10,13)-0;
-            matriceStylee[xa][ya] = currentColor;
+var snake = [] ;
 
-        }
+var x,y;
+var dir = 'r';
+var speed = 0;
+
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+
+function init(){
+
+  for (let x = 0; x < sizex; x++) {
+      for (let y = 0; y < sizey; y++) {
+          xpadded = ("00" + x).slice (-3);
+          ypadded = ("00" + y).slice (-3);
+          great_div_DOM.innerHTML += "<div class=\"insidediv\" id=\"indiv-"+ xpadded +"-"+ ypadded + "\"></div>\n";
+          document.querySelector("#indiv-"+ xpadded +"-"+ ypadded).style.left = x*23 + offsetx + "px";
+          document.querySelector("#indiv-"+ xpadded +"-"+ ypadded).style.top = y*23 + offsety + "px";
+
+      }
+
     }
 }
 
-function erase(){
-    matriceStylee = Array(40).fill().map(() => Array(20).fill(""));
-    document.querySelectorAll('.insidediv').forEach(item => { item.style.backgroundColor = "white"  ;});
-   
+
+//.shift() enlève le debut de la liste
+//.push() append at end
+
+function draw_point(x,y){
+
+  snake.push(new Point(x,y));
+
+  xpadded = ("00" + x).slice (-3);
+  ypadded = ("00" + y).slice (-3);
+
+  document.querySelector("#indiv-"+ xpadded +"-"+ ypadded).style.backgroundColor = "black";
+
+  var a = snake.shift();
+
+  xpadded = ("00" + a.x).slice (-3);
+  ypadded = ("00" + a.y).slice (-3);
+
+  document.querySelector("#indiv-"+ xpadded +"-"+ ypadded).style.backgroundColor = "white";
+
+
 }
+
+function draw_obs(x,y){
+
+
+  xpadded = ("00" + x).slice (-3);
+  ypadded = ("00" + y).slice (-3);
+
+  document.querySelector("#indiv-"+ xpadded +"-"+ ypadded).style.backgroundColor = "red";
+
+}
+
+function erase_pnt(x,y){
+
+
+  xpadded = ("00" + x).slice (-3);
+  ypadded = ("00" + y).slice (-3);
+
+  document.querySelector("#indiv-"+ xpadded +"-"+ ypadded).style.backgroundColor = "black";
+
+}
+
+
+
+
+document.addEventListener('keydown', logKey);
+
+function logKey(e) {
+  switch (e.code) {
+    case 'ArrowUp':
+      dir = 'u'
+      break;
+    case 'ArrowDown':
+      dir= 'd';
+      break;
+
+    case 'ArrowLeft':
+      dir = 'l';
+      break;
+
+    case 'ArrowRight':
+      dir = 'r';
+      break;
+
+
+  }
+}
+
+
+
+
+
+
+
+x=0;
+y=0;
+for (var i = 0; i < 5; i++) {
+    snake.push(new Point(x,y))
+    x++;
+}
+
+var obs = new Obstacle(5,5 );
+
+init();
+
+async function loop(timestamp) {
+  await sleep(400-speed);
+
+  draw_obs(obs.x, obs.y);
+
+  if(x == obs.x && y == obs.y){
+    snake.unshift(new Point (0,0));
+
+    speed += 30;
+    erase_pnt(obs.x, obs.y);
+    obs = new Obstacle(Math.floor(Math.random() * sizex) , Math.floor(Math.random() * sizey));
+
+
+  }
+
+  switch (dir) {
+    case 'u':
+      y--;
+      draw_point(x,y);
+      break;
+    case 'd':
+      y++;
+      draw_point(x,y);
+      break;
+
+    case 'l':
+      x--;
+      draw_point(x,y);
+      break;
+
+    case 'r':
+      x++;
+      draw_point(x,y);
+      break;
+
+
+
+  }
+
+  window.requestAnimationFrame(loop)
+}
+
+
+window.requestAnimationFrame(loop)
